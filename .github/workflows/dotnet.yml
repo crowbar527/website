@@ -1,0 +1,43 @@
+name: .NET
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 5.0.x
+    - name: Restore dependencies
+      run: dotnet restore
+    - name: Publish
+      run: dotnet publish -c Release -p:PublishProfile=FolderProfile
+    - name: Prepare server
+      uses: Evaneos/ssh-action@v0.1.0
+      with:
+          commands: sudo systemctl stop crowbarwebsite.service
+          hosts: ${{ secrets.HOST }}
+          user: deployaccount
+          password: ${{ secrets.PASSWORD }}      
+    - name: Copy folder content recursively to remote
+      uses: garygrossgarten/github-action-scp@release
+      with:
+          local: ./CrowbarWebsite/bin/Release/net5.0/linux-x64
+          remote: /var/www/websiteapp
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.SSH_USER }}
+          password: ${{ secrets.PASSWORD }}
+    - name: Restart website
+      uses: Evaneos/ssh-action@v0.1.0
+      with:
+          commands: sudo systemctl start crowbarwebsite.service
+          hosts: ${{ secrets.HOST }}
+          user: deployaccount
+          password: ${{ secrets.PASSWORD }}    
