@@ -13,6 +13,7 @@ using Amazon.Runtime;
 using Amazon.S3;
 using Amazon.S3.Model;
 using Amazon.S3.Transfer;
+using Amazon.Util;
 
 namespace CrowbarWebsite.Controllers
 {
@@ -24,7 +25,8 @@ namespace CrowbarWebsite.Controllers
         // Specify your bucket region (an example region is shown).
         private static readonly RegionEndpoint bucketRegion = RegionEndpoint.USEast2;
         private static IAmazonS3 client;
-        private Amazon.Runtime.AWSCredentials creds = new InstanceProfileAWSCredentials();
+        private Amazon.Runtime.AWSCredentials creds = new AssumeRoleAWSCredentials(new ECSTaskCredentials(), "arn:aws:iam::383519745720:role/Crowbar_S3-Access", "ec2profile");
+        
         public HomeController(ILogger<HomeController> logger)
         {
             _logger = logger;
