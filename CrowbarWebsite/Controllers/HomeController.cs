@@ -83,6 +83,7 @@ namespace CrowbarWebsite.Controllers
             catch (Exception ex)
             {
                 Debug.WriteLine(ex.Message);
+                return "";
             }
 
             
