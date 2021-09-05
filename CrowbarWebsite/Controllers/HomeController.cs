@@ -9,6 +9,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Xml;
 using Amazon;
+using Amazon.Runtime;
 using Amazon.S3;
 using Amazon.S3.Model;
 using Amazon.S3.Transfer;
@@ -23,6 +24,7 @@ namespace CrowbarWebsite.Controllers
         // Specify your bucket region (an example region is shown).
         private static readonly RegionEndpoint bucketRegion = RegionEndpoint.USEast2;
         private static IAmazonS3 client;
+        private Amazon.Runtime.AWSCredentials creds = new StoredProfileAWSCredentials("ec2profile");
         public HomeController(ILogger<HomeController> logger)
         {
             _logger = logger;
@@ -30,7 +32,7 @@ namespace CrowbarWebsite.Controllers
 
         public IActionResult Index()
         {
-            client = new AmazonS3Client(bucketRegion);
+            client = new AmazonS3Client(creds, bucketRegion);
             ReadObjectDataAsync().Wait();
             return View();
         }
