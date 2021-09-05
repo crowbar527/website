@@ -22,14 +22,16 @@ namespace CrowbarWebsite.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
+        private static string mainAccountAccess = "AKIAQHSUYTC4ZUPJYWRK";
+        private static string mainAccountSecret = "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";
         public HomeController(ILogger<HomeController> logger)
         {
             _logger = logger;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            downloadXML();
+            await downloadXML();
             return View();
         }
 
@@ -46,23 +48,26 @@ namespace CrowbarWebsite.Controllers
 
         static async Task downloadXML()
         {
-            AssumeRoleRequest assumeRequest = new AssumeRoleRequest
+            var basicCreds = new BasicAWSCredentials(mainAccountAccess, mainAccountSecret);
+            var stsClient = new AmazonSecurityTokenServiceClient(basicCreds);
+            var sessionResponse = await stsClient.GetSessionTokenAsync();
+
+            var sessionCreds = new SessionAWSCredentials(sessionResponse.Credentials.AccessKeyId,
+                sessionResponse.Credentials.SecretAccessKey, sessionResponse.Credentials.SessionToken);
+            AWSCredentials tempCredentials =
+                new AssumeRoleAWSCredentials(sessionCreds, "arn:aws:iam::383519745720:role/Crowbar_S3-Access", "crowbarwebsite");
+            AmazonS3Client s3Client = new AmazonS3Client(tempCredentials, RegionEndpoint.USEast2);
+            try
             {
-                RoleArn = "arn:aws:iam::383519745720:role/Crowbar_S3-Access",
-                DurationSeconds = 3600,
-                Policy =
-                    "{\"Version\": \"2012-10-17\",\"Statement\": [{\"Sid\": \"VisualEditor0\",\"Effect\": \"Allow\",\"Action\": \"sts:AssumeRole\",\"Resource\": \"arn:aws:iam::383519745720:role/Crowbar_S3-Access\",\"Condition\": {\"StringEquals\": {\"aws:RequestedRegion\": \"us-east-2\"}}}]}",
-            };
-            AmazonSecurityTokenServiceClient assumeRoleResult =
-                new AmazonSecurityTokenServiceClient(RegionEndpoint.USEast2);
-            AssumeRoleResponse response = assumeRoleResult.AssumeRoleAsync(assumeRequest).Result;
-            AWSCredentials tempCredentials = new SessionAWSCredentials(
-                response.Credentials.AccessKeyId,
-                response.Credentials.SecretAccessKey,
-                response.Credentials.SessionToken);
-            AmazonS3Client s3Client = new AmazonS3Client(tempCredentials);
-            string xmlDoc = ReadObjectDataAsync(s3Client, "crowbar-staticdata", "static_cameras.xml").Result;
-            System.IO.File.WriteAllText("cameras.xml", xmlDoc);
+                string xmlDoc = ReadObjectDataAsync(s3Client, "crowbar-staticdata", "static_cameras.xml").Result;
+                System.IO.File.WriteAllText("cameras.xml", xmlDoc);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+            }
+
+            
         }
 
         static async Task<string> ReadObjectDataAsync(AmazonS3Client client, String bucketName, String keyName)
