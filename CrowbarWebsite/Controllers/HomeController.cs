@@ -25,7 +25,7 @@ namespace CrowbarWebsite.Controllers
         // Specify your bucket region (an example region is shown).
         private static readonly RegionEndpoint bucketRegion = RegionEndpoint.USEast2;
         private static IAmazonS3 client;
-        private Amazon.Runtime.AWSCredentials creds = new AssumeRoleAWSCredentials(new ECSTaskCredentials(), "arn:aws:iam::383519745720:role/Crowbar_S3-Access", "ec2profile");
+        private Amazon.Runtime.AWSCredentials creds = new AssumeRoleAWSCredentials(new ECSTaskCredentials(), "arn:aws:iam::016283900089:role/ec2role", "ec2profile");
         
         public HomeController(ILogger<HomeController> logger)
         {
