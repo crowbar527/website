@@ -20,11 +20,11 @@ namespace CrowbarWebsite.Controllers
         public HomeController(ILogger<HomeController> logger)
         {
             _logger = logger;
-            GetS3Data();
         }
 
         public IActionResult Index()
         {
+            GetS3Data();
             return View();
         }
 
