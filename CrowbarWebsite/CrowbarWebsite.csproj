@@ -5,6 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="AWSSDK.S3" Version="3.7.2.1" />
     <PackageReference Include="GoogleMapControl.DEV" Version="8.0.1" />
   </ItemGroup>
 

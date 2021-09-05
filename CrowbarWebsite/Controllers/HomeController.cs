@@ -6,6 +6,10 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Xml;
+using Amazon;
+using Amazon.S3;
+using Amazon.S3.Transfer;
 
 namespace CrowbarWebsite.Controllers
 {
@@ -16,6 +20,7 @@ namespace CrowbarWebsite.Controllers
         public HomeController(ILogger<HomeController> logger)
         {
             _logger = logger;
+            GetS3Data();
         }
 
         public IActionResult Index()
@@ -32,6 +37,16 @@ namespace CrowbarWebsite.Controllers
         public IActionResult Error()
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        }
+
+        static async Task GetS3Data()
+        {
+#if !DEBUG
+            TransferUtility fileTransfer = new TransferUtility(new AmazonS3Client(RegionEndpoint.USEast2));
+            fileTransfer.Download("./static_cameras.xml", "crowbar-staticdata", "static_cameras.xml");
+#else
+            Debug.WriteLine("Won't try to access S3 on debug build");
+#endif
         }
     }
 }
