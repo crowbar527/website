@@ -13,6 +13,8 @@ using Amazon.Runtime;
 using Amazon.S3;
 using Amazon.S3.Model;
 using Amazon.S3.Transfer;
+using Amazon.SecurityToken;
+using Amazon.SecurityToken.Model;
 using Amazon.Util;
 
 namespace CrowbarWebsite.Controllers
@@ -27,8 +29,9 @@ namespace CrowbarWebsite.Controllers
 
         public IActionResult Index()
         {
-            RunCommand("aws",
-                    "s3 cp s3://crowbar-staticdata/static_cameras.xml ./static_cameras.xml --profile ec2profile");
+
+
+
             return View();
         }
 
@@ -43,28 +46,62 @@ namespace CrowbarWebsite.Controllers
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
 
-        string RunCommand(string command, string args)
+        static async Task downloadXML()
         {
-            var process = new Process()
+            AssumeRoleRequest assumeRequest = new AssumeRoleRequest
             {
-                StartInfo = new ProcessStartInfo
-                {
-                    FileName = command,
-                    Arguments = args,
-                    RedirectStandardOutput = true,
-                    RedirectStandardError = true,
-                    UseShellExecute = false,
-                    CreateNoWindow = true,
-                }
+                RoleArn = "arn:aws:iam::383519745720:role/Crowbar_S3-Access",
+                DurationSeconds = 3600,
+                Policy =
+                    "{\"Version\": \"2012-10-17\",\"Statement\": [{\"Sid\": \"VisualEditor0\",\"Effect\": \"Allow\",\"Action\": \"sts:AssumeRole\",\"Resource\": \"arn:aws:iam::383519745720:role/Crowbar_S3-Access\",\"Condition\": {\"StringEquals\": {\"aws:RequestedRegion\": \"us-east-2\"}}}]}",
             };
-            process.Start();
-            string output = process.StandardOutput.ReadToEnd();
-            string error = process.StandardError.ReadToEnd();
-            process.WaitForExit();
-
-            if (string.IsNullOrEmpty(error)) { return output; }
-            else { return error; }
+            AmazonSecurityTokenServiceClient assumeRoleResult =
+                new AmazonSecurityTokenServiceClient(RegionEndpoint.USEast2);
+            AssumeRoleResponse response = assumeRoleResult.AssumeRoleAsync(assumeRequest).Result;
+            AWSCredentials tempCredentials = new SessionAWSCredentials(
+                response.Credentials.AccessKeyId,
+                response.Credentials.SecretAccessKey,
+                response.Credentials.SessionToken);
+            AmazonS3Client s3Client = new AmazonS3Client(tempCredentials);
+            string xmlDoc = ReadObjectDataAsync(s3Client, "crowbar-staticdata", "static_cameras.xml").Result;
+            System.IO.File.WriteAllText("cameras.xml", xmlDoc);
         }
 
+        static async Task<string> ReadObjectDataAsync(AmazonS3Client client, String bucketName, String keyName)
+        {
+            string responseBody = "";
+            try
+            {
+                GetObjectRequest request = new GetObjectRequest
+                {
+                    BucketName = bucketName,
+                    Key = keyName
+                };
+                using (GetObjectResponse response = await client.GetObjectAsync(request))
+                using (Stream responseStream = response.ResponseStream)
+                using (StreamReader reader = new StreamReader(responseStream))
+                {
+                    string title = response.Metadata["x-amz-meta-title"]; // Assume you have "title" as medata added to the object.
+                    string contentType = response.Headers["Content-Type"];
+                    Console.WriteLine("Object metadata, Title: {0}", title);
+                    Console.WriteLine("Content type: {0}", contentType);
+
+                    responseBody = reader.ReadToEnd(); // Now you process the response body.
+                }
+
+                return responseBody;
+            }
+            catch (AmazonS3Exception e)
+            {
+                // If bucket or object does not exist
+                Console.WriteLine("Error encountered ***. Message:'{0}' when reading object", e.Message);
+                return "";
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Unknown encountered on server. Message:'{0}' when reading object", e.Message);
+                return "";
+            }
+        }
     }
 }
