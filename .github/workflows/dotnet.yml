@@ -37,7 +37,7 @@ jobs:
     - name: Restart website
       uses: garygrossgarten/github-action-ssh@v0.6.3
       with:
-          command: sudo systemctl start crowbarwebsite.service
+          command: chmod +x /var/www/websiteapp/CrowbarWebsite && sudo systemctl start crowbarwebsite.service
           host: ${{ secrets.HOST }}
           username: deployaccount
           privateKey: ${{ secrets.PRIVATEKEY }}   
