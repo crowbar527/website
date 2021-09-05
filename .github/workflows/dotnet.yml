@@ -26,16 +26,10 @@ jobs:
           host: ${{ secrets.HOST }}
           username: deployaccount
           privateKey: ${{ secrets.PRIVATEKEY }}
-    - name: gha-ssh
-  # You may pin to the exact commit or the version.
-  # uses: ryanchapman/gha-ssh@e4d012399f3d2643d6bf1c4dcb69daa8d572f083
-      uses: ryanchapman/gha-ssh@v1
-      with:
-          authorized_github_users: nzgamer41
     - name: Copy folder content recursively to remote
       uses: garygrossgarten/github-action-scp@release
       with:
-          local: ./CrowbarWebsite/bin/Release/net5.0/linux-x64
+          local: /home/runner/work/website/website/CrowbarWebsite/bin/Release/net5.0/publish/
           remote: /var/www/websiteapp
           host: ${{ secrets.HOST }}
           username: ${{ secrets.SSH_USER }}
