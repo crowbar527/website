@@ -29,9 +29,7 @@ namespace CrowbarWebsite.Controllers
 
         public IActionResult Index()
         {
-
-
-
+            downloadXML();
             return View();
         }
 
