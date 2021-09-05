@@ -20,13 +20,6 @@ namespace CrowbarWebsite.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
-        private const string bucketName = "crowbar-staticdata";
-        private const string keyName = "static_cameras.xml";
-        // Specify your bucket region (an example region is shown).
-        private static readonly RegionEndpoint bucketRegion = RegionEndpoint.USEast2;
-        private static IAmazonS3 client;
-        private Amazon.Runtime.AWSCredentials creds = new AssumeRoleAWSCredentials(new ECSTaskCredentials(), "arn:aws:iam::016283900089:role/ec2role", "ec2profile");
-        
         public HomeController(ILogger<HomeController> logger)
         {
             _logger = logger;
@@ -34,8 +27,8 @@ namespace CrowbarWebsite.Controllers
 
         public IActionResult Index()
         {
-            client = new AmazonS3Client(creds, bucketRegion);
-            ReadObjectDataAsync().Wait();
+            RunCommand("aws",
+                    "s3 cp s3://crowbar-staticdata/static_cameras.xml ./static_cameras.xml --profile ec2profile");
             return View();
         }
 
@@ -50,38 +43,28 @@ namespace CrowbarWebsite.Controllers
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
 
-        static async Task ReadObjectDataAsync()
+        string RunCommand(string command, string args)
         {
-            string responseBody = "";
-            try
+            var process = new Process()
             {
-                GetObjectRequest request = new GetObjectRequest
+                StartInfo = new ProcessStartInfo
                 {
-                    BucketName = bucketName,
-                    Key = keyName
-                };
-                using (GetObjectResponse response = await client.GetObjectAsync(request))
-                using (Stream responseStream = response.ResponseStream)
-                using (StreamReader reader = new StreamReader(responseStream))
-                {
-                    string title = response.Metadata["x-amz-meta-title"]; // Assume you have "title" as medata added to the object.
-                    string contentType = response.Headers["Content-Type"];
-                    Console.WriteLine("Object metadata, Title: {0}", title);
-                    Console.WriteLine("Content type: {0}", contentType);
-
-                    responseBody = reader.ReadToEnd(); // Now you process the response body.
+                    FileName = command,
+                    Arguments = args,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    UseShellExecute = false,
+                    CreateNoWindow = true,
                 }
-                System.IO.File.WriteAllText("static_cameras.xml", responseBody);
-            }
-            catch (AmazonS3Exception e)
-            {
-                // If bucket or object does not exist
-                Console.WriteLine("Error encountered ***. Message:'{0}' when reading object", e.Message);
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine("Unknown encountered on server. Message:'{0}' when reading object", e.Message);
-            }
+            };
+            process.Start();
+            string output = process.StandardOutput.ReadToEnd();
+            string error = process.StandardError.ReadToEnd();
+            process.WaitForExit();
+
+            if (string.IsNullOrEmpty(error)) { return output; }
+            else { return error; }
         }
+
     }
 }
