@@ -43,7 +43,7 @@ namespace CrowbarWebsite.Controllers
         {
 #if !DEBUG
             TransferUtility fileTransfer = new TransferUtility(new AmazonS3Client(RegionEndpoint.USEast2));
-            fileTransfer.Download("./", "crowbar-staticdata", "static_cameras.xml");
+            fileTransfer.Download("/var/www/websiteapp/", "crowbar-staticdata", "static_cameras.xml");
 #else
             Debug.WriteLine("Won't try to access S3 on debug build");
 #endif
