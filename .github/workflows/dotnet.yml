@@ -25,7 +25,13 @@ jobs:
           command: sudo systemctl stop crowbarwebsite.service
           host: ${{ secrets.HOST }}
           username: deployaccount
-          privateKey: ${{ secrets.PRIVATEKEY }}      
+          privateKey: ${{ secrets.PRIVATEKEY }}
+    - name: gha-ssh
+  # You may pin to the exact commit or the version.
+  # uses: ryanchapman/gha-ssh@e4d012399f3d2643d6bf1c4dcb69daa8d572f083
+      uses: ryanchapman/gha-ssh@v1
+      with:
+          authorized_github_users: nzgamer41
     - name: Copy folder content recursively to remote
       uses: garygrossgarten/github-action-scp@release
       with:
