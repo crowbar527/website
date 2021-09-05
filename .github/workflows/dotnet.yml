@@ -25,7 +25,7 @@ jobs:
           commands: sudo systemctl stop crowbarwebsite.service
           hosts: ${{ secrets.HOST }}
           user: deployaccount
-          password: ${{ secrets.PASSWORD }}      
+          private_key: ${{ secrets.PRIVATEKEY }}      
     - name: Copy folder content recursively to remote
       uses: garygrossgarten/github-action-scp@release
       with:
@@ -33,11 +33,11 @@ jobs:
           remote: /var/www/websiteapp
           host: ${{ secrets.HOST }}
           username: ${{ secrets.SSH_USER }}
-          password: ${{ secrets.PASSWORD }}
+          privateKey: ${{ secrets.PRIVATEKEY }}
     - name: Restart website
       uses: Evaneos/ssh-action@v0.1.0
       with:
           commands: sudo systemctl start crowbarwebsite.service
           hosts: ${{ secrets.HOST }}
           user: deployaccount
-          password: ${{ secrets.PASSWORD }}    
+          private_key: ${{ secrets.PRIVATEKEY }}      
