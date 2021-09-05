@@ -33,8 +33,8 @@ namespace CrowbarWebsite.Controllers
         public async Task<IActionResult> Index()
         {
             //Download Static Camera XML
-            string xmlstr = "<?xml version=\"1.0\" encoding=\"utf-8\"?><static-cameras><camera><street>Twin Coast Discovery Highway </street><area>Twin Coast Discovery Highway </area><startpos><lat>-36.170245</lat><long>174.447012</long></startpos><endpos><lat>-36.190333</lat><long>174.450727</long></endpos><installed>Aug-2018</installed></camera></static-cameras>";
-            await downloadXML();
+            string xmlstr = await downloadXML();
+
             //Generate Camera Objects from XML
             List<StaticCamera> cameras = new List<StaticCamera>();
             using (var xmlr = XMLHelpers.CreateFromString(xmlstr))
@@ -64,7 +64,7 @@ namespace CrowbarWebsite.Controllers
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
 
-        static async Task downloadXML()
+        static async Task<string> downloadXML()
         {
             var basicCreds = new BasicAWSCredentials(mainAccountAccess, mainAccountSecret);
             var stsClient = new AmazonSecurityTokenServiceClient(basicCreds);
@@ -78,7 +78,7 @@ namespace CrowbarWebsite.Controllers
             try
             {
                 string xmlDoc = ReadObjectDataAsync(s3Client, "crowbar-staticdata", "static_cameras.xml").Result;
-                System.IO.File.WriteAllText("cameras.xml", xmlDoc);
+                return xmlDoc;
             }
             catch (Exception ex)
             {
