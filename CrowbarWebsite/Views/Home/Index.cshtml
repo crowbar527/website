@@ -16,24 +16,7 @@
 
     </div>
 
-    <script type="text/javascript">
-        function DisplayGoogleMap() {
-
-            //Set the Latitude and Longitude of the Map
-            var myAddress = new google.maps.LatLng(-41.2177074, 178.1841412);
-
-            //Create Options or set different Characteristics of Google Map
-            var mapOptions = {
-                center: myAddress,
-                zoom: 5.96,
-                minZoom: 5.96,
-                mapTypeId: google.maps.MapTypeId.ROADMAP
-            };
-
-            //Display the Google map in the div control with the defined Options
-            var map = new google.maps.Map(document.getElementById("myDiv"), mapOptions);
-        }
-    </script>
+   
     <!--Setup map-->
     <script>
         var mymap = L.map('ljsmap').setView([-41.2177074, 178.1841412], 5.96);
@@ -43,17 +26,43 @@
             tileSize: 512,
             zoomOffset: -1
         }).addTo(mymap);
+        //Create Icons
+        var redIcon = L.icon({
+            iconUrl: './lib/Leaflet/images/marker-icon-red.png',
+            iconSize: [25, 41],
+            iconAnchor: [12, 41],
+            popupAnchor: [0, -41]
+        });
+        var blueIcon = L.icon({
+            iconUrl: './lib/Leaflet/images/marker-icon.png',
+            iconSize: [25, 41],
+            iconAnchor: [12, 41],
+            popupAnchor: [0, -41]
+        });
     </script>
 
     @foreach (var item in Model)
     {
-        <script>
+        if (item.Type == "STATIC")
+        {
+            <script>
             var marker = L.marker([@item.StartPos.Latitude, @item.StartPos.Longtitude], {
-
+                icon: blueIcon
             });
             marker.bindPopup('@item.Installed');
     marker.addTo(mymap);
-        </script>
+            </script>
+        }
+        else
+        {
+            <script>
+            var marker = L.marker([@item.StartPos.Latitude, @item.StartPos.Longtitude], {
+                icon: redIcon
+            });
+            marker.bindPopup('@item.Installed');
+    marker.addTo(mymap);
+            </script>
+        }
     }
 
 </body>
