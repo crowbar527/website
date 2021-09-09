@@ -9,7 +9,7 @@ namespace CrowbarWebsite.Models
 {
     public class StaticCamera
     {
-        private string _street = "", _area = "";
+        private string _street = "", _area = "", _type = "";
         private Coord _startpos, _endpos;
         private DateTime _installed;
 
@@ -18,6 +18,7 @@ namespace CrowbarWebsite.Models
         public Coord StartPos => _startpos;
         public Coord EndPos => _endpos;
         public DateTime Installed => _installed;
+        public string Type => _type;
 
         public static StaticCamera FromXML(XmlReader xmlReader)
         {
@@ -25,6 +26,7 @@ namespace CrowbarWebsite.Models
             var items = xmlReader.ReadElement("camera");
             if (items.Count == 0)
                 return null;
+            sc._type = items["type"];
             sc._street = items["street"];
             sc._area = items["area"];
             sc._startpos = new Coord(double.Parse(items["startpos.lat"]), double.Parse(items["startpos.long"]));
@@ -33,4 +35,6 @@ namespace CrowbarWebsite.Models
             return sc;
         }
     }
+
+
 }
