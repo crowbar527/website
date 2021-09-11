@@ -34,7 +34,7 @@ namespace CrowbarWebsite.Controllers
         {
             //Download Static Camera XML
             string xmlstr = await downloadXML();
-
+            
             //Generate Camera Objects from XML
             List<StaticCamera> cameras = new List<StaticCamera>();
             using (var xmlr = XMLHelpers.CreateFromString(xmlstr))
