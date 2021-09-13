@@ -56,11 +56,7 @@ namespace CrowbarWebsite.Controllers
                 {
                     camera = StaticCamera.FromXML(xmlr);
                     if (camera != null)
-                    {
-                        var crashData = await getCrashData(camera.Street.ToUpper());
-                        camera.setCrashInfo(crashData);
                         cameras.Add(camera);
-                    }
 
                 } while (camera != null);
             }
