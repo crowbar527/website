@@ -7,6 +7,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using System.Xml;
 using Amazon;
@@ -17,6 +19,10 @@ using Amazon.S3.Transfer;
 using Amazon.SecurityToken;
 using Amazon.SecurityToken.Model;
 using Amazon.Util;
+using Anywhere.ArcGIS;
+using Anywhere.ArcGIS.Common;
+using Anywhere.ArcGIS.Operation;
+using Newtonsoft.Json;
 
 namespace CrowbarWebsite.Controllers
 {
@@ -32,6 +38,10 @@ namespace CrowbarWebsite.Controllers
 
         public async Task<IActionResult> Index()
         {
+#if DEBUG
+            var data = await getCrashData("KILLARNEY ROAD");
+#endif
+
             //Download Static Camera XML
             string xmlstr = await downloadXML();
             
@@ -44,7 +54,11 @@ namespace CrowbarWebsite.Controllers
                 {
                     camera = StaticCamera.FromXML(xmlr);
                     if (camera != null)
+                    {
+                        var crashData = await getCrashData(camera.Street.ToUpper());
+                        camera.setCrashInfo(crashData);
                         cameras.Add(camera);
+                    }
 
                 } while (camera != null);
             }
@@ -124,6 +138,24 @@ namespace CrowbarWebsite.Controllers
                 Console.WriteLine("Unknown encountered on server. Message:'{0}' when reading object", e.Message);
                 return "";
             }
+        }
+
+        static async Task<QueryResponse<Point>> getCrashData(string location)
+        {
+            string url =
+                @"https://services.arcgis.com/CXBb7LAjgIIdcsPt/arcgis/rest/services/CAS_Data_Public/FeatureServer/0/query?where=crashLocation1%20%3D%20'NAME1'%20OR%20crashLocation2%20%3D%20'NAME1'&outFields=&outSR=4326&f=json";
+
+
+            var gateway = new PortalGateway("https://services.arcgis.com/CXBb7LAjgIIdcsPt/arcgis/");
+            string qw = "crashLocation1 = '" + location + "'";
+            var query = new Query("CAS_Data_Public/FeatureServer/0".AsEndpoint())
+            {
+                Where = qw
+            };
+            query.OutputSpatialReference = SpatialReference.WGS84;
+            QueryResponse<Point> result = await gateway.Query<Point>(query);
+
+            return result;
         }
     }
 }

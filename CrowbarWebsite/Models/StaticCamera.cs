@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Xml;
+using Anywhere.ArcGIS.Common;
+using Anywhere.ArcGIS.Operation;
 
 namespace CrowbarWebsite.Models
 {
@@ -12,6 +14,7 @@ namespace CrowbarWebsite.Models
         private string _street = "", _area = "", _type = "";
         private Coord _startpos, _endpos;
         private DateTime _installed;
+        private QueryResponse<Point> _crashinfo;
 
         public string Street => _street;
         public string Area => _area;
@@ -19,6 +22,12 @@ namespace CrowbarWebsite.Models
         public Coord EndPos => _endpos;
         public DateTime Installed => _installed;
         public string Type => _type;
+        public QueryResponse<Point> crashInfo => _crashinfo;
+
+        public void setCrashInfo(QueryResponse<Point> data)
+        {
+            _crashinfo = data;
+        }
 
         public static StaticCamera FromXML(XmlReader xmlReader)
         {

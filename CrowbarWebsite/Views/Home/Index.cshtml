@@ -48,7 +48,7 @@
             var marker = L.marker([@item.StartPos.Latitude, @item.StartPos.Longtitude], {
                 icon: icon_staticcamera
             });
-            marker.bindPopup('@item.Street');
+            marker.bindPopup('@item.Street '+ '\nNumber of crashes:' +' @item.crashInfo.Features.Count()');
     marker.addTo(mymap);
             </script>
         }
