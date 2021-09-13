@@ -1,4 +1,5 @@
 ﻿@model IEnumerable<StaticCamera>
+@using CrowbarWebsite.Services; 
 @{
     ViewData["Title"] = "Home Page";
 }
@@ -48,7 +49,7 @@
             var marker = L.marker([@item.StartPos.Latitude, @item.StartPos.Longtitude], {
                 icon: icon_staticcamera
             });
-            marker.bindPopup('@item.Street '+ '\nNumber of crashes:' +' @item.crashInfo.Features.Count()');
+                marker.bindPopup('@item.Street ' + '\nNumber of crashes:' + ' @CacheService.GetPointsForCamera($"{item.Street}.{item.Area}").Count()');
     marker.addTo(mymap);
             </script>
         }

@@ -38,12 +38,14 @@ namespace CrowbarWebsite.Controllers
 
         public async Task<IActionResult> Index()
         {
+            /*
 #if DEBUG
             var data = await getCrashData("KILLARNEY ROAD");
 #endif
+            */
 
             //Download Static Camera XML
-            string xmlstr = await downloadXML();
+            string xmlstr = await AWSHelpers.downloadXML();
             
             //Generate Camera Objects from XML
             List<StaticCamera> cameras = new List<StaticCamera>();
