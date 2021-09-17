@@ -1,0 +1,22 @@
+﻿@keyframes animate {
+    0% {
+        background: #0080ff;
+    }
+
+    100% {
+        background: #00C2FF;
+    }
+}
+
+
+.splash_background {
+    position: fixed;
+    width: 100vw;
+    height: 100vh;
+    top: 0;
+    left: 0;
+    margin: 0;
+    padding: 0;
+    animation: animate 5s ease-in-out infinite alternate;
+    overflow: hidden;
+}

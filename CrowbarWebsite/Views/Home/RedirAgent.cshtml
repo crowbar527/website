@@ -1,0 +1,13 @@
+﻿@using CrowbarWebsite.Services;
+@*
+    For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@if (CacheService.IsCacheReady)
+{
+    <script>
+        $(function () {
+            window.location.reload();
+        })
+    </script>
+}
+<div class="splash_progressbar" style="background:white; height: 10px; border-radius: 3px; width: @($"{CacheService.LoadPercentage}%")">

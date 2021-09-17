@@ -2,4 +2,33 @@
     For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 *@
 @{
+    ViewData["Title"] = "Loading...";
+
 }
+<div>
+    <ul class="splash_background">
+    </ul>
+    <div style="display:flex;position:fixed;flex-direction: column; top:50%;left:50%;transform:translate(-50%,-50%);">
+        <div>
+            <p style="text-align:center;font-family:'arial'; color:white;font-size:20"> Fetching Data... </p>
+        </div>
+        <div id="RedirAgent" style="border: white 1px solid; height: 10px; border-radius: 6px; padding: 3px">
+            @Html.Partial("RedirAgent");
+            </div>
+        </div>
+    </div>
+
+    <div style="position:fixed;bottom:0;left:50%;transform:translate(-50%,-50%);">
+        <p style="text-align:center;color:lightgray;font-weight:700; font-family:'Arial'"> C R O W B A R</p>
+    </div>
+</div>
+<script>
+
+    $(function () {
+
+        setInterval(function () { $('#RedirAgent').load('/Home/RedirAgent'); }, 3000); // every 3 sec
+
+    });
+
+</script>
+
