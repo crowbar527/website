@@ -23,6 +23,7 @@ using Anywhere.ArcGIS;
 using Anywhere.ArcGIS.Common;
 using Anywhere.ArcGIS.Operation;
 using Newtonsoft.Json;
+using CrowbarWebsite.Services;
 
 namespace CrowbarWebsite.Controllers
 {
@@ -36,35 +37,41 @@ namespace CrowbarWebsite.Controllers
             _logger = logger;
         }
 
+        public IActionResult RedirAgent()
+        {
+            return PartialView("RedirAgent");
+        }
         public async Task<IActionResult> Index()
         {
-            /*
-#if DEBUG
-            var data = await getCrashData("KILLARNEY ROAD");
-#endif
-            */
-
-            //Download Static Camera XML
-            string xmlstr = await AWSHelpers.downloadXML();
-            
-            //Generate Camera Objects from XML
-            List<StaticCamera> cameras = new List<StaticCamera>();
-            using (var xmlr = XMLHelpers.CreateFromString(xmlstr))
+            //If Cache is not ready
+            if (!CacheService.IsCacheReady)
             {
-                StaticCamera camera = null;
-                do
-                {
-                    camera = StaticCamera.FromXML(xmlr);
-                    if (camera != null)
-                        cameras.Add(camera);
-
-                } while (camera != null);
+                //Return Splash Screen
+                CacheService.Update();
+                ViewData["IsSplash"] = true;
+                return View("Splash");
             }
-            
-            //Pass to Page
-            return View(cameras);
-        }
+            else
+            {
+                //Download Static Camera XML
+                string xmlstr = await AWSHelpers.downloadXML();
 
+                //Generate Camera Objects from XML
+                List<StaticCamera> cameras = new List<StaticCamera>();
+                using (var xmlr = XMLHelpers.CreateFromString(xmlstr))
+                {
+                    StaticCamera camera = null;
+                    do
+                    {
+                        camera = StaticCamera.FromXML(xmlr);
+                        if (camera != null)
+                            cameras.Add(camera);
+
+                    } while (camera != null);
+                }
+                return View("Index", cameras);
+            }
+        }
         public IActionResult Privacy()
         {
             return View();
