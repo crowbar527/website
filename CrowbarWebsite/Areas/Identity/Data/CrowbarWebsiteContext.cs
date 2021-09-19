@@ -14,6 +14,7 @@ namespace CrowbarWebsite.Data
         public CrowbarWebsiteContext(DbContextOptions<CrowbarWebsiteContext> options)
             : base(options)
         {
+            Database.EnsureCreated();
         }
 
         protected override void OnModelCreating(ModelBuilder builder)
