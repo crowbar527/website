@@ -6,7 +6,9 @@
   <ItemGroup>
     <PackageReference Include="Anywhere.ArcGIS" Version="2.0.0" />
     <PackageReference Include="AWSSDK.S3" Version="3.7.2.1" />
+    <PackageReference Include="AWSSDK.SecretsManager" Version="3.7.1.21" />
     <PackageReference Include="AWSSDK.SecurityToken" Version="3.7.1.51" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="5.0.10" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="5.0.9" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="5.0.9" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="5.0.9" />
