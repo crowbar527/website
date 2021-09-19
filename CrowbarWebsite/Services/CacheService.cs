@@ -26,10 +26,11 @@ namespace CrowbarWebsite.Services
 
         static event EventHandler _onContentUpdated;
 
-        public static bool IsCacheReady => _cache.Count != 0 &&  !_isInitial;
+        public static bool IsCacheReady => _cache.Count != 0 && !_isInitial;
         public static DateTime LastUpdated => _lastUpdate;
         public static int RecommendedTTL => UPDATEINTERVAL;
         public static int LoadPercentage => _expectedCount == 0 ? 0 : (int)Math.Min(100, Math.Max(0, 100 * ((float)_cache.Count) / _expectedCount));
+
 
         public static List<Point> GetPointsForCamera(string camera)
         {
@@ -64,7 +65,6 @@ namespace CrowbarWebsite.Services
             }
 
         }
-
         internal static void Update()
         {
             DownloadAsync();
@@ -104,7 +104,7 @@ namespace CrowbarWebsite.Services
                         try
                         {
                             var crashData = await CASHelpers.getCrashData(cam.Street.ToUpper());
-                            var points = crashData.GetPoints().Where(x => x.IsInBounds(cam.StartPos,CASMATCHBOUNDS)).ToList();
+                            var points = crashData.GetPoints().Where(x => x.IsInBounds(cam.StartPos, CASMATCHBOUNDS)).ToList();
                             _cache.AddOrUpdate($"{cam.Street}.{cam.Area}", points, (k, v) => points);
                         }
                         catch
