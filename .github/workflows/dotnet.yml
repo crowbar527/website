@@ -17,6 +17,10 @@ jobs:
         dotnet-version: 5.0.x
     - name: Restore dependencies
       run: dotnet restore
+    - name: Ensure EFCore is installed
+      run: dotnet tool install --global dotnet-ef
+    - name: Migrate DB
+      run: dotnet ef database update
     - name: Publish
       run: dotnet publish -c Release -p:PublishProfile=FolderProfile
     - name: Prepare server
