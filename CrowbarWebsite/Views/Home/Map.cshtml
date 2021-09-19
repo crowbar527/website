@@ -12,7 +12,7 @@
 
 </div>
 <span id="lastupdateddiv">
-    @($"Last Updated: {CacheService.LastUpdated.ToString("HH:mm")}")
+    @($"Last Updated: {CacheService.LastUpdated.ToLocalTime().ToString("HH:mm")}")
 </span>
 
 <!--Setup map-->
