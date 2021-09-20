@@ -1,5 +1,9 @@
 ﻿@model List<CrowbarWebsite.Models.StaticCamera>
 @using CrowbarWebsite.Services;
+@using Microsoft.AspNetCore.Identity
+@using CrowbarWebsite.Areas.Identity.Data
+@inject SignInManager<CrowbarWebsiteUser> SignInManager
+@inject UserManager<CrowbarWebsiteUser> UserManager
 
 <head>
     <script src="https://maps.googleapis.com/maps/api/js?"></script>
@@ -41,24 +45,41 @@
 
 @foreach (var item in Model)
 {
-    if (item.Type == "STATIC")
+
     {
-        <script>
+        @if (SignInManager.IsSignedIn(User))
+        {
+
+            //Add Marker
+            <script>
             var marker = L.marker([@item.StartPos.Latitude, @item.StartPos.Longtitude], {
-                icon: icon_staticcamera
+                icon: @(item.Type.Equals("STATIC") ? "icon_staticcamera" : "icon_redlight")
             });
                 marker.bindPopup('@item.Street ' + '\nNumber of crashes:' + ' @CacheService.GetPointsForCamera($"{item.Street}.{item.Area}").Count()');
-    marker.addTo(mymap);
-        </script>
-    }
-    else
-    {
-        <script>
+            marker.addTo(mymap);
+            </script>
+            //Add Area
+<script>
+                var a2c94_center = [@($"{item.StartPos.Latitude},{item.StartPos.Longtitude}")]
+                var a2c94 = L.circle(a2c94_center,{
+                    color: 'red',
+                    radius: @(CacheService.CASRadiusInMeters),
+                    fillcolor: '#f03',
+                    fillopacity: 0.5,
+                    units: 'meters',
+                }).addTo(mymap);
+</script>
+        }
+        else
+        {
+            //Add Marker
+            <script>
             var marker = L.marker([@item.StartPos.Latitude, @item.StartPos.Longtitude], {
-                icon: icon_redlight
+                icon: @(item.Type.Equals("STATIC") ? "icon_staticcamera" : "icon_redlight")
             });
-            marker.bindPopup('@item.Street');
-    marker.addTo(mymap);
-        </script>
+                marker.bindPopup('Kindly please give us your password to see Crash Data');
+                marker.addTo(mymap);
+            </script>
+        }
     }
 }
