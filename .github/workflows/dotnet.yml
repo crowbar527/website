@@ -44,4 +44,26 @@ jobs:
           command: chmod +x /var/www/websiteapp/CrowbarWebsite && sudo systemctl start crowbarwebsite.service
           host: ${{ secrets.HOST }}
           username: deployaccount
-          privateKey: ${{ secrets.PRIVATEKEY }}   
+          privateKey: ${{ secrets.PRIVATEKEY }}
+    - name: Prepare failover server
+      uses: garygrossgarten/github-action-ssh@v0.6.3
+      with:
+          command: sudo systemctl stop crowbarwebsite.service
+          host: ${{ secrets.FAILOVER_HOST }}
+          username: deployaccount
+          privateKey: ${{ secrets.PRIVATEKEY }}
+    - name: Copy folder content recursively to failover remote
+      uses: garygrossgarten/github-action-scp@release
+      with:
+          local: /home/runner/work/website/website/CrowbarWebsite/bin/Release/net5.0/publish/
+          remote: /var/www/websiteapp
+          host: ${{ secrets.FAILOVER_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          privateKey: ${{ secrets.PRIVATEKEY }}
+    - name: Restart failover website
+      uses: garygrossgarten/github-action-ssh@v0.6.3
+      with:
+          command: chmod +x /var/www/websiteapp/CrowbarWebsite && sudo systemctl start crowbarwebsite.service
+          host: ${{ secrets.FAILOVER_HOST }}
+          username: deployaccount
+          privateKey: ${{ secrets.PRIVATEKEY }}  
