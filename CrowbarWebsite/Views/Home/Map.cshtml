@@ -1,5 +1,10 @@
 ﻿@model List<CrowbarWebsite.Models.StaticCamera>
 @using CrowbarWebsite.Services;
+@using Microsoft.AspNetCore.Identity
+@using CrowbarWebsite.Areas.Identity.Data
+@using CrowbarWebsite.Helpers;
+@inject SignInManager<CrowbarWebsiteUser> SignInManager
+@inject UserManager<CrowbarWebsiteUser> UserManager
 
 <head>
     <script src="https://maps.googleapis.com/maps/api/js?"></script>
@@ -12,7 +17,7 @@
 
 </div>
 <span id="lastupdateddiv">
-    @($"Last Updated: {CacheService.LastUpdated.ToLocalTime().ToString("HH:mm")}")
+    @($"Last Updated: { CacheService.LastUpdated.ToLocalTime().ToString("HH:mm")} UTC")
 </span>
 
 <!--Setup map-->
@@ -39,26 +44,59 @@
     });
 </script>
 
-@foreach (var item in Model)
-{
-    if (item.Type == "STATIC")
+<script>
+    @foreach (var item in Model)
     {
-        <script>
-            var marker = L.marker([@item.StartPos.Latitude, @item.StartPos.Longtitude], {
-                icon: icon_staticcamera
-            });
-                marker.bindPopup('@item.Street ' + '\nNumber of crashes:' + ' @CacheService.GetPointsForCamera($"{item.Street}.{item.Area}").Count()');
-    marker.addTo(mymap);
-        </script>
+        @if (SignInManager.IsSignedIn(User))
+        {
+            //Add Marker
+            <text>
+                marker = L.marker([@item.StartPos.Latitude, @item.StartPos.Longtitude], {
+                icon: @(item.Type.Equals("STATIC") ? "icon_staticcamera" : "icon_redlight")
+                });
+            </text>
+            using (var dmgh = new DisposableMapGenHelper(item, 0.001))
+            {
+                <text>
+                    marker.bindPopup('@item.Street ' + '\nNumber of crashes:' + '@(dmgh.CameraPoints.Count)');
+                    marker.addTo(mymap);
+                </text>
+                    foreach (var cam in dmgh.CameraPoints)
+                    {
+                    <text>
+                        L.circle([@cam.Y,@cam.X], {
+                        color: 'blue',
+                        radius: 5,
+                        fillcolor: 'blue',
+                        fillopacity: 0.5,
+                        units: 'meters',
+                        }).addTo(mymap);
+                    </text>
+                    }
+            }
+
+            //Add Area
+            <text>
+                L.circle([@item.StartPos.Latitude,@item.StartPos.Longtitude],{
+                color: 'red',
+                radius: @(CacheService.CASRadiusInMeters),
+                fillcolor: '#f03',
+                fillopacity: 0.5,
+                units: 'meters',
+                }).addTo(mymap);
+            </text>
+        }
+        else
+        {
+            //Add Marker
+            <text>
+                marker = L.marker([@item.StartPos.Latitude, @item.StartPos.Longtitude], {
+                icon: @(item.Type.Equals("STATIC") ? "icon_staticcamera" : "icon_redlight")
+                });
+                marker.bindPopup('Kindly please give us your password to see Crash Data');
+                marker.addTo(mymap);
+            </text>
+        }
     }
-    else
-    {
-        <script>
-            var marker = L.marker([@item.StartPos.Latitude, @item.StartPos.Longtitude], {
-                icon: icon_redlight
-            });
-            marker.bindPopup('@item.Street');
-    marker.addTo(mymap);
-        </script>
-    }
-}
+</script>
+

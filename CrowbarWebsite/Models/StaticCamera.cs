@@ -18,6 +18,12 @@ namespace CrowbarWebsite.Models
 
         public string Street => _street;
         public string Area => _area;
+
+        internal string GetInternalName()
+        {
+            return $"{_street}.{_area}";
+        }
+
         public Coord StartPos => _startpos;
         public Coord EndPos => _endpos;
         public DateTime Installed => _installed;
