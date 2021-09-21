@@ -1,9 +1,9 @@
 ﻿@using CrowbarWebsite.Services;
 @using Microsoft.AspNetCore.Identity
-@using CrowbarWebsite.Areas.Identity.Data
 @using CrowbarWebsite.Helpers;
-@inject SignInManager<CrowbarWebsiteUser> SignInManager
-@inject UserManager<CrowbarWebsiteUser> UserManager
+@inject SignInManager<DynamoIdentityUser> SignInManager
+@inject UserManager<DynamoIdentityUser> UserManager
+@using AspNetCore.Identity.DynamoDB
 @using CrowbarWebsite.Services;
 @{
     ViewData["Title"] = "CROWBAR";
@@ -19,12 +19,12 @@
     }
     else
     {
-            <div id="indexdock_sidebar">
-                <partial name="InteractiveSideBar" model="UserPref.GenerateFromSESSION(Context.Session)" />
-            </div>
-            <div id="indexdock_map">
-                <partial name="Map"/>
-            </div>
+        <div id="indexdock_sidebar">
+            <partial name="InteractiveSideBar" model="UserPref.GenerateFromSESSION(Context.Session)" />
+        </div>
+        <div id="indexdock_map">
+            <partial name="Map" />
+        </div>
     }
 </body>
 
