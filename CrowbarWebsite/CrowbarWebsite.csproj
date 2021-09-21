@@ -4,7 +4,10 @@
     <TargetFramework>net5.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="Amazon.AspNetCore.Identity.Cognito" Version="3.0.0" />
+    <PackageReference Include="Amazon.Extensions.CognitoAuthentication" Version="2.2.2" />
     <PackageReference Include="Anywhere.ArcGIS" Version="2.0.0" />
+    <PackageReference Include="AWSSDK.DynamoDBv2" Version="3.7.0.69" />
     <PackageReference Include="AWSSDK.S3" Version="3.7.2.1" />
     <PackageReference Include="AWSSDK.SecretsManager" Version="3.7.1.21" />
     <PackageReference Include="AWSSDK.SecurityToken" Version="3.7.1.51" />
@@ -19,5 +22,13 @@
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="5.0.2" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="AspNetCore.Identity.DynamoDB">
+      <HintPath>Dependencies\AspNetCore.Identity.DynamoDB.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Areas\Identity\Data\" />
   </ItemGroup>
 </Project>

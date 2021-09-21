@@ -9,8 +9,14 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Amazon.DynamoDBv2;
+using Amazon.DynamoDBv2.DataModel;
 using Amazon.SecretsManager;
 using Amazon.SecretsManager.Model;
+using AspNetCore.Identity.DynamoDB;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
@@ -167,6 +173,17 @@ namespace CrowbarWebsite.Helpers
             Dictionary<string, string> data = JsonConvert.DeserializeObject<Dictionary<string, string>>(secret);
             return data;
             // Your code goes here.
+        }
+
+        public static async Task<AWSCredentials> getCreds()
+        {
+            var basicCreds = new BasicAWSCredentials(mainAccountAccess, mainAccountSecret);
+            var stsClient = new AmazonSecurityTokenServiceClient(basicCreds);
+            var sessionResponse = await stsClient.GetSessionTokenAsync();
+
+            var sessionCreds = new SessionAWSCredentials(sessionResponse.Credentials.AccessKeyId,
+                sessionResponse.Credentials.SecretAccessKey, sessionResponse.Credentials.SessionToken);
+            return sessionCreds;
         }
     }
 }

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using CrowbarWebsite.Areas.Identity.Data;
-using CrowbarWebsite.Data;
+using AspNetCore.Identity.DynamoDB;
 using CrowbarWebsite.Helpers;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
@@ -17,13 +16,20 @@ namespace CrowbarWebsite.Areas.Identity
     {
         public void Configure(IWebHostBuilder builder)
         {
-            builder.ConfigureServices((context, services) => {
-                services.AddDbContext<CrowbarWebsiteContext>(options =>
-                    options.UseSqlite(
-                        context.Configuration.GetConnectionString("CrowbarWebsiteContextConnection")));
+            builder.ConfigureServices((context, services) =>
+            {
+                services.AddDefaultIdentity<DynamoIdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
+                    .AddRoles<DynamoIdentityRole>()
+                    .AddDefaultTokenProviders();
 
-                services.AddDefaultIdentity<CrowbarWebsiteUser>(options => options.SignIn.RequireConfirmedAccount = true)
-                    .AddEntityFrameworkStores<CrowbarWebsiteContext>();
+                services
+                    .AddSingleton<DynamoRoleUsersStore<DynamoIdentityRole, DynamoIdentityUser>,
+                        DynamoRoleUsersStore<DynamoIdentityRole, DynamoIdentityUser>>();
+                services
+                    .AddSingleton<IUserStore<DynamoIdentityUser>,
+                        DynamoUserStore<DynamoIdentityUser, DynamoIdentityRole>>();
+                services.AddSingleton<IRoleStore<DynamoIdentityRole>, DynamoRoleStore<DynamoIdentityRole>>();
+
                 Dictionary<string, string> goog = AWSHelpers.GetSecret().Result;
                 services.AddAuthentication()
                     .AddGoogle(options =>

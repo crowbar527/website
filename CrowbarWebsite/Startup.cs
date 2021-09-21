@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -8,10 +9,24 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Amazon;
+using Amazon.DynamoDBv2;
+using Amazon.Runtime;
+using Amazon.DynamoDBv2.DataModel;
+using AspNetCore.Identity.DynamoDB;
+using CrowbarWebsite.Helpers;
 using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.Extensions.Options;
 
 namespace CrowbarWebsite
 {
+    public class DynamoDbSettings
+    {
+        public string ServiceUrl { get; set; }
+        public string UsersTableName { get; set; }
+        public string RolesTableName { get; set; }
+        public string RoleUsersTableName { get; set; }
+    }
     public class Startup
     {
         public Startup(IConfiguration configuration)
@@ -53,6 +68,26 @@ namespace CrowbarWebsite
 
             app.UseAuthentication();
             app.UseAuthorization();
+
+            var options = app.ApplicationServices.GetService<IOptions<DynamoDbSettings>>();
+
+            var credentials = AWSHelpers.getCreds().Result;
+            var client = new AmazonDynamoDBClient(credentials, RegionEndpoint.APSoutheast2);
+
+            var context = new DynamoDBContext(client);
+
+            var userStore = app.ApplicationServices
+                    .GetService<IUserStore<DynamoIdentityUser>>()
+                as DynamoUserStore<DynamoIdentityUser, DynamoIdentityRole>;
+            var roleStore = app.ApplicationServices
+                    .GetService<IRoleStore<DynamoIdentityRole>>()
+                as DynamoRoleStore<DynamoIdentityRole>;
+            var roleUsersStore = app.ApplicationServices
+                .GetService<DynamoRoleUsersStore<DynamoIdentityRole, DynamoIdentityUser>>();
+
+            userStore.EnsureInitializedAsync(client, context, "CrowbarUsers").Wait();
+            roleStore.EnsureInitializedAsync(client, context, "CrowbarRoles").Wait();
+            roleUsersStore.EnsureInitializedAsync(client, context, "CrowbarRoleUser").Wait();
 
             app.UseEndpoints(endpoints =>
             {

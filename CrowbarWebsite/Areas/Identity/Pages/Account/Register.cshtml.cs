@@ -5,9 +5,10 @@ using System.Linq;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
+using AspNetCore.Identity.DynamoDB;
+using AspNetCore.Identity.DynamoDB.Models;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
-using CrowbarWebsite.Areas.Identity.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -20,14 +21,14 @@ namespace CrowbarWebsite.Areas.Identity.Pages.Account
     [AllowAnonymous]
     public class RegisterModel : PageModel
     {
-        private readonly SignInManager<CrowbarWebsiteUser> _signInManager;
-        private readonly UserManager<CrowbarWebsiteUser> _userManager;
+        private readonly SignInManager<DynamoIdentityUser> _signInManager;
+        private readonly UserManager<DynamoIdentityUser> _userManager;
         private readonly ILogger<RegisterModel> _logger;
         private readonly IEmailSender _emailSender;
 
         public RegisterModel(
-            UserManager<CrowbarWebsiteUser> userManager,
-            SignInManager<CrowbarWebsiteUser> signInManager,
+            UserManager<DynamoIdentityUser> userManager,
+            SignInManager<DynamoIdentityUser> signInManager,
             ILogger<RegisterModel> logger,
             IEmailSender emailSender)
         {
@@ -75,7 +76,7 @@ namespace CrowbarWebsite.Areas.Identity.Pages.Account
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
             if (ModelState.IsValid)
             {
-                var user = new CrowbarWebsiteUser { UserName = Input.Email, Email = Input.Email };
+                var user = new DynamoIdentityUser { UserName = Input.Email, Email = new DynamoUserEmail(Input.Email) };
                 var result = await _userManager.CreateAsync(user, Input.Password);
                 if (result.Succeeded)
                 {

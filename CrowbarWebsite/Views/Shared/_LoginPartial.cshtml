@@ -1,8 +1,8 @@
 ﻿@using Microsoft.AspNetCore.Identity
-@using CrowbarWebsite.Areas.Identity.Data
+@using AspNetCore.Identity.DynamoDB
 
-@inject SignInManager<CrowbarWebsiteUser> SignInManager
-@inject UserManager<CrowbarWebsiteUser> UserManager
+@inject SignInManager<DynamoIdentityUser> SignInManager
+@inject UserManager<DynamoIdentityUser> UserManager
 
 <ul class="navbar-nav">
 @if (SignInManager.IsSignedIn(User))

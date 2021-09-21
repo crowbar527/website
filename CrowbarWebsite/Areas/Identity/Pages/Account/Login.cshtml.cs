@@ -4,8 +4,8 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
+using AspNetCore.Identity.DynamoDB;
 using Microsoft.AspNetCore.Authorization;
-using CrowbarWebsite.Areas.Identity.Data;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
@@ -18,13 +18,13 @@ namespace CrowbarWebsite.Areas.Identity.Pages.Account
     [AllowAnonymous]
     public class LoginModel : PageModel
     {
-        private readonly UserManager<CrowbarWebsiteUser> _userManager;
-        private readonly SignInManager<CrowbarWebsiteUser> _signInManager;
+        private readonly UserManager<DynamoIdentityUser> _userManager;
+        private readonly SignInManager<DynamoIdentityUser> _signInManager;
         private readonly ILogger<LoginModel> _logger;
 
-        public LoginModel(SignInManager<CrowbarWebsiteUser> signInManager, 
+        public LoginModel(SignInManager<DynamoIdentityUser> signInManager, 
             ILogger<LoginModel> logger,
-            UserManager<CrowbarWebsiteUser> userManager)
+            UserManager<DynamoIdentityUser> userManager)
         {
             _userManager = userManager;
             _signInManager = signInManager;
