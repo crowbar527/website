@@ -17,7 +17,6 @@ namespace CrowbarWebsite.Services
         const double CASMATCHBOUNDS = 0.001; //In Meters, ~100m
 
         static ConcurrentDictionary<string, List<Point>> _cache = new ConcurrentDictionary<string, List<Point>>();
-        static ConcurrentBag<StaticCamera> _cameras = new ConcurrentBag<StaticCamera>();
         static DateTime _lastUpdate = DateTime.Now;
         static int _expectedCount = 0;
         static bool _isInitial = true;
@@ -31,7 +30,6 @@ namespace CrowbarWebsite.Services
         public static DateTime LastUpdated => _lastUpdate;
         public static int RecommendedTTL => UPDATEINTERVAL;
         public static int LoadPercentage => _expectedCount == 0 ? 0 : (int)Math.Min(100, Math.Max(0, 100 * ((float)_cache.Count) / _expectedCount));
-        public static ConcurrentBag<StaticCamera> Cameras => _cameras;
 
         public static double CASRadiusInMeters => ConvertToMeters(CASMATCHBOUNDS);
 
@@ -42,8 +40,6 @@ namespace CrowbarWebsite.Services
 
         public static List<Point> GetPointsForCamera(string camera)
         {
-            if (Program.RUNTIME_FLAG_NOCACHE)
-                return new List<Point>();
             if (!_cache.ContainsKey(camera))
             {
 
@@ -91,6 +87,9 @@ namespace CrowbarWebsite.Services
                     //Download Cameras
                     string xmlstr = await AWSHelpers.downloadXML();
 
+                    //Count Cameras
+                    var cams = new List<StaticCamera>();
+
                     //For Each Camera
                     using (var xmlr = XMLHelpers.CreateFromString(xmlstr))
                     {
@@ -100,13 +99,13 @@ namespace CrowbarWebsite.Services
                             camera = StaticCamera.FromXML(xmlr);
                             if (camera != null)
                             {
-                                _cameras.Add(camera);
+                                cams.Add(camera);
                             }
 
                         } while (camera != null);
                     }
-                    _expectedCount = _cameras.Count;
-                    foreach (var cam in _cameras)
+                    _expectedCount = cams.Count;
+                    foreach (var cam in cams)
                     {
                         try
                         {
@@ -119,6 +118,7 @@ namespace CrowbarWebsite.Services
                             _expectedCount--;
                         }
                     }
+                    cams = null;
                     //Tell all waiting threads to resume
                     _backgroundRunning = false;
                     _lastUpdate = DateTime.Now;

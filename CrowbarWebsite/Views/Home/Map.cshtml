@@ -1,6 +1,7 @@
-﻿@using CrowbarWebsite.Services;
+﻿@model List<CrowbarWebsite.Models.StaticCamera>
+@using CrowbarWebsite.Services;
 @using Microsoft.AspNetCore.Identity
-@using CrowbarWebsite.Areas.Identity.Data
+
 @using CrowbarWebsite.Helpers;
 @using AspNetCore.Identity.DynamoDB
 @inject SignInManager<DynamoIdentityUser> SignInManager
@@ -45,18 +46,14 @@
 </script>
 
 <script>
-    
-    @{UserPref up = UserPref.GenerateFromSESSION(Context.Session); }
-    @foreach (var item in CacheService.Cameras)
+    @foreach (var item in Model)
     {
         @if (SignInManager.IsSignedIn(User))
         {
-            @if (((!up.CFG__SHOW_SCAMS && item.Type.Equals("STATIC")) || (!up.CFG__SHOW_RCAMS && !item.Type.Equals("STATIC"))))
-                    continue;
-                //Add Marker
+            //Add Marker
             <text>
                 marker = L.marker([@item.StartPos.Latitude, @item.StartPos.Longtitude], {
-            icon: @(item.Type.Equals("STATIC") ? "icon_staticcamera" : "icon_redlight")
+                icon: @(item.Type.Equals("STATIC") ? "icon_staticcamera" : "icon_redlight")
                 });
             </text>
             using (var dmgh = new DisposableMapGenHelper(item, 0.001))
@@ -97,7 +94,7 @@
                 marker = L.marker([@item.StartPos.Latitude, @item.StartPos.Longtitude], {
                 icon: @(item.Type.Equals("STATIC") ? "icon_staticcamera" : "icon_redlight")
                 });
-                marker.bindPopup('Log in to see crash data!');
+                marker.bindPopup('Kindly please give us your password to see Crash Data');
                 marker.addTo(mymap);
             </text>
         }
