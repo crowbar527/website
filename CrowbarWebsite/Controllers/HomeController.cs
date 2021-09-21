@@ -36,6 +36,17 @@ namespace CrowbarWebsite.Controllers
         {
             _logger = logger;
         }
+        [HttpPost]
+        public IActionResult SetSessionPrefs(string pref, string value)
+        {
+            HttpContext.Session.SetString(pref, value);
+            return Json("Ok");
+        }
+
+        public IActionResult Map()
+        {
+            return PartialView("Map");
+        }
         public IActionResult RedirAgent()
         {
             return PartialView("RedirAgent");
@@ -43,7 +54,7 @@ namespace CrowbarWebsite.Controllers
         public async Task<IActionResult> Index()
         {
             //If Cache is not ready
-            if (!CacheService.IsCacheReady)
+            if (!CacheService.IsCacheReady && !Program.RUNTIME_FLAG_NOCACHE)
             {
                 //Return Splash Screen
                 CacheService.Update();
@@ -52,6 +63,7 @@ namespace CrowbarWebsite.Controllers
             }
             else
             {
+                /* MOVED TO CACHE SERVICE (Do we need it here?)
                 //Download Static Camera XML
                 string xmlstr = await AWSHelpers.downloadXML();
 
@@ -68,7 +80,8 @@ namespace CrowbarWebsite.Controllers
 
                     } while (camera != null);
                 }
-                return View("Index", cameras);
+                */
+                return View("Index");
             }
         }
 

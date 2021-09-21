@@ -1,11 +1,31 @@
-﻿@model List<StaticCamera>
+﻿@using CrowbarWebsite.Services;
+@using Microsoft.AspNetCore.Identity
+@using CrowbarWebsite.Areas.Identity.Data
+@using CrowbarWebsite.Helpers;
+@inject SignInManager<CrowbarWebsiteUser> SignInManager
+@inject UserManager<CrowbarWebsiteUser> UserManager
 @using CrowbarWebsite.Services;
 @{
     ViewData["Title"] = "CROWBAR";
 }
 
 <body id="mapbody">
-    @Html.Partial("Map", Model)
+    @if (!SignInManager.IsSignedIn(User))
+    {
+        <div id="indexBANNER_giveusyourcookies">
+            Login or Register to access all site features!
+        </div>
+        <partial name="Map" />
+    }
+    else
+    {
+            <div id="indexdock_sidebar">
+                <partial name="InteractiveSideBar" model="UserPref.GenerateFromSESSION(Context.Session)" />
+            </div>
+            <div id="indexdock_map">
+                <partial name="Map"/>
+            </div>
+    }
 </body>
 
 <script>
