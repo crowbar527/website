@@ -47,6 +47,10 @@ namespace CrowbarWebsite.Controllers
         {
             return PartialView("Map");
         }
+        public IActionResult MapContent()
+        {
+            return PartialView("MapContent");
+        }
         public IActionResult RedirAgent()
         {
             return PartialView("RedirAgent");

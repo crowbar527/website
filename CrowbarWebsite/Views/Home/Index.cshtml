@@ -1,10 +1,11 @@
 ﻿@using CrowbarWebsite.Services;
 @using Microsoft.AspNetCore.Identity
-@using CrowbarWebsite.Areas.Identity.Data
 @using CrowbarWebsite.Helpers;
-@inject SignInManager<CrowbarWebsiteUser> SignInManager
-@inject UserManager<CrowbarWebsiteUser> UserManager
 @using CrowbarWebsite.Services;
+@using AspNetCore.Identity.DynamoDB
+@inject SignInManager<DynamoIdentityUser> SignInManager
+@inject UserManager<DynamoIdentityUser> UserManager
+
 @{
     ViewData["Title"] = "CROWBAR";
 }
@@ -15,21 +16,24 @@
         <div id="indexBANNER_giveusyourcookies">
             Login or Register to access all site features!
         </div>
-        <partial name="Map" />
+            <partial name="Map" />
     }
     else
     {
+        /* <div id="indexdock_sidebar">
+            <partial name="InteractiveSideBar" model="UserPref.GenerateFromSESSION(Context.Session)" />
+        </div>
+        <div id="indexdock_map">
+            <partial name="Map" />
+        </div>*/
+        <div class="CROWBARUI_FlexiWide">
             <div id="indexdock_sidebar">
                 <partial name="InteractiveSideBar" model="UserPref.GenerateFromSESSION(Context.Session)" />
             </div>
             <div id="indexdock_map">
-                <partial name="Map"/>
+                <partial name="Map" />
             </div>
+        </div>
     }
 </body>
 
-<script>
-    $(function () {
-        setInterval(function () { $('#mapbody').load('/Home/Map'); }, @CacheService.RecommendedTTL); //Automatic Refresh Timer
-    });
-</script>

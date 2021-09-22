@@ -6,44 +6,123 @@
 @{
 }
 
+@if (Program.RUNTIME_FLAG_NOCACHE)
+{
+    <div class="CROWBARUI_FloatingSection">
+        <div id="indexBANNER_giveusyourcookies">RUNTIME_FLAG_NOCACHE</div>
+        <div class="CROWBARUI_SectionContainer">
+            <span style="text-align:center;">
+                Warning: Cache Service has been disabled, CAS Data will not be displayed
+            </span>
+        </div>
+    </div>
+    <br />
+}
 <div class="CROWBARUI_FloatingSection">
     <H5 class="CROWBARUI_SectionHeader">
-        Filter Elements
+        Cameras
     </H5>
     <div class="CROWBARUI_SectionContainer">
         <span>
-            @(Html.CheckBox("xui_cfg-scams", Model.CFG__SHOW_SCAMS, new { @onclick = "x32_scams()" })) Show Static Cameras
+            @(Html.CheckBox("xui_cfg-scams", Model.CFG__SHOW_SCAMS, new { @alt= UserPref.SNAMES[UserPrefProps.SHOW_STATIC_CAMERAS], @onclick = "x32_notify(this)" })) Show Static Cameras
         </span>
+        <br />
         <span>
-            @(Html.CheckBox("xui_cfg-rcams", Model.CFG__SHOW_RCAMS, new { @onclick = "x32_rcams()" })) Show Traffic Cameras
+            @(Html.CheckBox("xui_cfg-rcams", Model.CFG__SHOW_RCAMS, new { @alt = UserPref.SNAMES[UserPrefProps.SHOW_RDLGHT_CAMERAS], @onclick = "x32_notify(this)" })) Show Traffic Cameras
+        </span>
+    </div>
+
+</div>
+<br />
+<div class="CROWBARUI_FloatingSection">
+    <H5 class="CROWBARUI_SectionHeader">
+        Crash Analysis
+    </H5>
+    <div class="CROWBARUI_SectionContainer">
+        <span>
+            @(Html.CheckBox("xui_cfg-scaa", Model.CFG__SHOW_AREA, new { @alt = UserPref.SNAMES[UserPrefProps.SHOW_ANAAAL_AREA], @onclick = "x32_notify(this)" })) Show Crash Analysis Area
+        </span>
+        <br />
+        <span>
+            @(Html.CheckBox("xui_cfg-scas", Model.CFG__SHOW_CAS, new { @alt = UserPref.SNAMES[UserPrefProps.SHOW_ANAAAL_CAS], @onclick = "x32_notify(this)" })) Show Crashes within Analysis Area
+        </span>
+        <hr class="CROWBARUI_ContatinerContentHR" />
+        <span class="CROWBARUI_ContatinerContentCenter">
+            Analysis Area Range (Meters)
+        </span>
+        <span class="CROWBARUI_ContatinerContentCenter">
+            <input type="range" min="100" max="1000" value="@Model.CFG__AREA_RADIUS" class="slider" id="xui_cfg-arad" alt="@UserPref.SNAMES[UserPrefProps.PREF_AREAA_RADIUS]" onchange="x48_notify(this)" />
+        </span>
+        <span id="xui_cfg-arad_ui" class="CROWBARUI_ContatinerContentCenter">
+            @Model.CFG__AREA_RADIUS
+        </span>
+    </div>
+
+</div>
+<br />
+<div class="CROWBARUI_FloatingSection">
+    <H5 class="CROWBARUI_SectionHeader">
+        Advanced Filters
+    </H5>
+    <div class="CROWBARUI_SectionContainer">
+        <span class="CROWBARUI_ContatinerContentCenter">
+            Minimum Crash Count
+        </span>
+        <span class="CROWBARUI_ContatinerContentCenter">
+            <input type="range" min="0" max="999" value="@Model.CFG__ADVF_MINCAS" data-minslidepair="xui_cfg-cmin" data-maxslidepair="xui_cfg-cmax" class="slider" id="xui_cfg-cmin" alt="@UserPref.SNAMES[UserPrefProps.PREF_ADVFL_MINCAS]" onchange="x47_notify(this)" />
+        </span>
+        <span id="xui_cfg-cmin_ui" class="CROWBARUI_ContatinerContentCenter">
+            @Model.CFG__ADVF_MINCAS
+        </span>
+        <hr class="CROWBARUI_ContatinerContentHR" />
+        <span class="CROWBARUI_ContatinerContentCenter">
+            Maximum Crash Count
+        </span>
+        <span class="CROWBARUI_ContatinerContentCenter">
+            <input type="range" min="0" max="999" value="@Model.CFG__ADVF_MAXCAS" data-minslidepair="xui_cfg-cmin" data-maxslidepair="xui_cfg-cmax" class="slider" id="xui_cfg-cmax"  alt="@UserPref.SNAMES[UserPrefProps.PREF_ADVFL_MAXCAS]" onchange="x47_notify(this)" />
+        </span>
+        <span id="xui_cfg-cmax_ui" class="CROWBARUI_ContatinerContentCenter">
+            @Model.CFG__ADVF_MAXCAS
         </span>
     </div>
 
 </div>
 
 <script>
-    function x32_scams() {
-        SubmitPref('@UserPref.SNAMES[UserPrefProps.SHOW_STATIC_CAMERAS]', $("#xui_cfg-scams").prop("checked"));
+    function x32_notify(element) {
+        SubmitPref(element.alt, element.checked);
     }
-    function x32_rcams() {
-        SubmitPref('@UserPref.SNAMES[UserPrefProps.SHOW_STATIC_CAMERAS]', $("#xui_cfg-rcams").prop("checked"));
+    function x48_notify(element) {
+        SubmitPref(element.alt, element.value);
+        $("#" + element.id + "_ui").prop("innerHTML", element.value);
+    }
+    function x47_notify(element) {
+        if ((element.value > document.getElementById(element.getAttribute("data-maxslidepair")).value) && element.id == element.getAttribute("data-minslidepair")) {
+            element.value = document.getElementById(element.getAttribute("data-maxslidepair")).value;
+        }
+        else if ((element.value < document.getElementById(element.getAttribute("data-minslidepair")).value) && element.id == element.getAttribute("data-maxslidepair")) {
+            element.value = document.getElementById(element.getAttribute("data-minslidepair")).value;
+        }
+        SubmitPref(element.alt, element.value);
+        $("#" + element.id + "_ui").prop("innerHTML", element.value);
+        
     }
 
 
     //Reload Map
     function SubmitPref(pref, val) {
-          $.ajax({
-              url: '/Home/SetSessionPrefs?pref='+pref+'&value='+val,
-              type: 'POST',
-              dataType: "json",
-              cache: false,
-              success: function (data) {
-                  //do stuff;
-                  $('#indexdock_map').load('/Home/Map');
-              },
-              error: function () {
+        $.ajax({
+            url: '/Home/SetSessionPrefs?pref=' + pref + '&value=' + val,
+            type: 'POST',
+            dataType: "json",
+            cache: false,
+            success: function (data) {
+                //do stuff;
+                $('#mapmap_mapcontent').load('/Home/MapContent');
+            },
+            error: function () {
                 console.log("no display");
-              }
-          });
-      }
+            }
+        });
+    }
 </script>

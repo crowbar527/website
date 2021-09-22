@@ -1,0 +1,95 @@
+﻿@using CrowbarWebsite.Services;
+@using Microsoft.AspNetCore.Identity
+@using CrowbarWebsite.Helpers;
+@using AspNetCore.Identity.DynamoDB
+@inject SignInManager<DynamoIdentityUser> SignInManager
+@inject UserManager<DynamoIdentityUser> UserManager
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    <script>
+        if (mymarkers.length > 0) {
+            mymarkers.forEach(x => {
+                mymap.removeLayer(x);
+            });
+            mymarkers = [];
+        }
+    @{UserPref up = UserPref.GenerateFromSESSION(Context.Session); }
+    @foreach (var item in CacheService.Cameras)
+    {
+        @if (SignInManager.IsSignedIn(User))
+        {
+            @if (((!up.CFG__SHOW_SCAMS && item.Type.Equals("STATIC")) || (!up.CFG__SHOW_RCAMS && !item.Type.Equals("STATIC"))))
+                    continue;
+                //Add Marker
+            <text>
+                marker = L.marker([@item.StartPos.Latitude, @item.StartPos.Longtitude], {
+            icon: @(item.Type.Equals("STATIC") ? "icon_staticcamera" : "icon_redlight")
+                });
+            </text>
+
+                using (var dmgh = new DisposableMapGenHelper(item, 0.001))
+                {
+                <text>
+        marker.bindPopup('@item.Street ' + '\nNumber of crashes:' + '@(dmgh.CameraPoints.Count)');
+           </text>
+                if (dmgh.CameraPoints.Count >= up.CFG__ADVF_MINCAS && dmgh.CameraPoints.Count <= up.CFG__ADVF_MAXCAS)
+                {
+                        <text>
+                        mymarkers.push(marker);
+                        </text>
+                }
+                else continue;
+
+                if (up.CFG__SHOW_CAS)
+                {
+                    foreach (var cam in dmgh.CameraPoints)
+                    {
+                    <text>
+                        mymarkers.push(L.circle([@cam.Y,@cam.X], {
+                            color: 'blue',
+                            radius: 5,
+                            fillcolor: 'blue',
+                            fillopacity: 0.5,
+                            units: 'meters',
+                        }));
+                    </text>
+                        }
+                    
+                }
+            }
+            if (up.CFG__SHOW_AREA)
+            {
+                //Add Area
+            <text>
+                mymarkers.push(L.circle([@item.StartPos.Latitude,@item.StartPos.Longtitude], {
+                    color: 'red',
+                    radius: @(up.CFG__AREA_RADIUS),
+                    fillcolor: '#f03',
+                    fillopacity: 0.5,
+                    units: 'meters',
+                }));
+            </text>
+            }
+        }
+        else
+        {
+            //Add Marker
+            <text>
+                marker = L.marker([@item.StartPos.Latitude, @item.StartPos.Longtitude], {
+                icon: @(item.Type.Equals("STATIC") ? "icon_staticcamera" : "icon_redlight")
+                });
+        marker.bindPopup('Log in to see crash data!');
+        mymarkers.push(marker);
+            </text>
+        }
+        <text>
+        mymarkers.forEach(x =>
+        {
+            x.addTo(mymap);
+        });
+        </text>
+    }
+    </script>
+}

@@ -4,20 +4,26 @@
     padding: 10px;
     border-radius: 10px;
     background-color: white;
-    left: 50%;
-    transform: translate(-50%,0%);
     z-index: 10000;
+    border: 1px solid #808BA0;
+}
+
+#lastupdatedivparent {
+    display: flex;
+    justify-content: center;
+    
 }
 
 #indexdock_sidebar {
-    float:left;
+    left:0;
     width: 30%;
 }
 
 #indexdock_map {
-    float: right;
+    right: 0;
     margin-left: 10px;
     width: calc(70% - 10px);
+
 }
 
 #indexBANNER_giveusyourcookies {
@@ -45,8 +51,8 @@
     color: black;
     font-family: Arial;
     text-align: center;
-    padding:3px;
-    margin:0;
+    padding: 3px;
+    margin: 0;
 }
 
 .CROWBARUI_SectionContainer {
@@ -55,3 +61,23 @@
     flex-direction: column;
 }
 
+.CROWBARUI_FlexiWide {
+    display: flex;
+    flex-direction: row;
+    min-height: 800px;
+}
+
+.CROWBARUI_FlexiTall {
+    display: flex;
+    flex-direction: column;
+    min-height: 800px;
+}
+
+.CROWBARUI_ContatinerContentCenter {
+    text-align: center;
+}
+
+.CROWBARUI_ContatinerContentHR {
+    width: 100%;
+    border-color: #808BA0;
+}

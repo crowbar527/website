@@ -6,21 +6,23 @@
 @inject UserManager<DynamoIdentityUser> UserManager
 
 <head>
-    <script src="https://maps.googleapis.com/maps/api/js?"></script>
     <!--Include Leaflet-->
     <link rel="stylesheet" href="~/lib/Leaflet/leaflet.css" />
     <script src="~/lib/Leaflet/leaflet.js"></script>
 
 </head>
-<div id="ljsmap" style="width:100%;height:800px;">
-
+<div id="ljsmap" style="width: 100%; height: 100%; min-height: 800px">
+    
 </div>
-<span id="lastupdateddiv">
-    @($"Last Updated: { CacheService.LastUpdated.ToLocalTime().ToString("HH:mm")} UTC")
-</span>
+<div id="lastupdatedivparent">
+    <span id="lastupdateddiv">
+        @($"Last Updated: { CacheService.LastUpdated.ToLocalTime().ToString("HH:mm")} UTC")
+    </span>
+</div>
 
 <!--Setup map-->
 <script>
+    var mymarkers = [];
     var mymap = L.map('ljsmap').setView([-41.2177074, 178.1841412], 5.96);
     L.tileLayer('https://a.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '<a href="https://www.openstreetmap.org/copyright">© OpenStreetMap contributors</a>',
@@ -43,63 +45,9 @@
     });
 </script>
 
-<script>
-    
-    @{UserPref up = UserPref.GenerateFromSESSION(Context.Session); }
-    @foreach (var item in CacheService.Cameras)
-    {
-        @if (SignInManager.IsSignedIn(User))
-        {
-            @if (((!up.CFG__SHOW_SCAMS && item.Type.Equals("STATIC")) || (!up.CFG__SHOW_RCAMS && !item.Type.Equals("STATIC"))))
-                    continue;
-                //Add Marker
-            <text>
-                marker = L.marker([@item.StartPos.Latitude, @item.StartPos.Longtitude], {
-            icon: @(item.Type.Equals("STATIC") ? "icon_staticcamera" : "icon_redlight")
-                });
-            </text>
-            using (var dmgh = new DisposableMapGenHelper(item, 0.001))
-            {
-                <text>
-                    marker.bindPopup('@item.Street ' + '\nNumber of crashes:' + '@(dmgh.CameraPoints.Count)');
-                    marker.addTo(mymap);
-                </text>
-                    foreach (var cam in dmgh.CameraPoints)
-                    {
-                    <text>
-                        L.circle([@cam.Y,@cam.X], {
-                        color: 'blue',
-                        radius: 5,
-                        fillcolor: 'blue',
-                        fillopacity: 0.5,
-                        units: 'meters',
-                        }).addTo(mymap);
-                    </text>
-                    }
-            }
+<div id="mapmap_mapcontent">
+    <partial name="MapContent" />
+</div>
 
-            //Add Area
-            <text>
-                L.circle([@item.StartPos.Latitude,@item.StartPos.Longtitude],{
-                color: 'red',
-                radius: @(CacheService.CASRadiusInMeters),
-                fillcolor: '#f03',
-                fillopacity: 0.5,
-                units: 'meters',
-                }).addTo(mymap);
-            </text>
-        }
-        else
-        {
-            //Add Marker
-            <text>
-                marker = L.marker([@item.StartPos.Latitude, @item.StartPos.Longtitude], {
-                icon: @(item.Type.Equals("STATIC") ? "icon_staticcamera" : "icon_redlight")
-                });
-                marker.bindPopup('Log in to see crash data!');
-                marker.addTo(mymap);
-            </text>
-        }
-    }
-</script>
+
 
