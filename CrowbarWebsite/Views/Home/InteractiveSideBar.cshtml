@@ -87,6 +87,28 @@
     </div>
 
 </div>
+<br />
+<div class="CROWBARUI_FloatingSection">
+    <H5 class="CROWBARUI_SectionHeader">
+        Heatmap
+    </H5>
+    <div class="CROWBARUI_SectionContainer">
+        <span>
+            @(Html.CheckBox("xui_cfg-hmap", Model.CFG__ADVO_HEATMAP, new { @alt= UserPref.SNAMES[UserPrefProps.PREF_ADVOP_HEATMAP], @onclick = "x32_notify(this)" })) Show Heatmap
+        </span>
+    </div>
+
+</div>
+<br />
+<div class="CROWBARUI_FloatingSection">
+    <H5 class="CROWBARUI_SectionHeader">
+        
+    </H5>
+    <div class="CROWBARUI_SectionContainer">
+        <p style="text-align:center;color:lightgray;font-weight:700; font-family:'Arial'; margin-bottom: 0"> C R O W B A R</p>
+    </div>
+
+</div>
 
 <script>
     function x32_notify(element) {

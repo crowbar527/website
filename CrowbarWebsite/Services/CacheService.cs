@@ -40,6 +40,11 @@ namespace CrowbarWebsite.Services
             return (double)(cASMATCHBOUNDS * 110000);
         }
 
+        public static double ConvertToNonMeters(double value)
+        {
+            return (double)(value / 110000);
+        }
+
         public static List<Point> GetPointsForCamera(string camera)
         {
             if (Program.RUNTIME_FLAG_NOCACHE)
@@ -79,6 +84,7 @@ namespace CrowbarWebsite.Services
         {
             DownloadAsync();
         }
+        
         private static void DownloadCameras()
         {
             //Download Cameras

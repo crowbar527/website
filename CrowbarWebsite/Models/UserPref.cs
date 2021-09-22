@@ -19,8 +19,9 @@ namespace CrowbarWebsite.Models
             {UserPrefProps.PREF_AREAA_RADIUS, "xcfg__CFG_AREARADIUS" },
             {UserPrefProps.PREF_ADVFL_MAXCAS, "xcfg__CFG_MAXCAS" },
             {UserPrefProps.PREF_ADVFL_MINCAS, "xcfg__CFG_MINCAS" },
+            {UserPrefProps.PREF_ADVOP_HEATMAP, "xcf__CFG_HEATMAP" }
         };
-        private bool __scams = true, __rcams = true, __aarea = true, __acas = true;
+        private bool __scams = true, __rcams = true, __aarea = true, __acas = true, __hmap = false;
         private int __arad = 200, __cmax = 9999, __cmin = 0;
         public bool CFG__SHOW_SCAMS { get => __scams; set => __scams = value; }
         public bool CFG__SHOW_RCAMS { get => __rcams; set => __rcams = value; }
@@ -29,6 +30,7 @@ namespace CrowbarWebsite.Models
         public int CFG__AREA_RADIUS => __arad;
         public int CFG__ADVF_MAXCAS => __cmax;
         public int CFG__ADVF_MINCAS => __cmin;
+        public bool CFG__ADVO_HEATMAP => __hmap;
 
         [Obsolete]
         public static UserPref GenerateFromCOOKIES(IRequestCookieCollection cookies)
@@ -53,7 +55,8 @@ namespace CrowbarWebsite.Models
                 __acas = bool.Parse(session.GetString(SNAMES[UserPrefProps.SHOW_ANAAAL_CAS]) ?? "true"),
                 __arad = int.Parse(session.GetString(SNAMES[UserPrefProps.PREF_AREAA_RADIUS]) ?? CacheService.CASRadiusInMeters.ToString()),
                 __cmax = int.Parse(session.GetString(SNAMES[UserPrefProps.PREF_ADVFL_MAXCAS]) ?? "999"),
-                __cmin = int.Parse(session.GetString(SNAMES[UserPrefProps.PREF_ADVFL_MINCAS]) ?? "0")
+                __cmin = int.Parse(session.GetString(SNAMES[UserPrefProps.PREF_ADVFL_MINCAS]) ?? "0"),
+                __hmap = bool.Parse(session.GetString(SNAMES[UserPrefProps.PREF_ADVOP_HEATMAP]) ?? "false")
             };
 
             if (up.__cmax < up.__cmin)
@@ -76,6 +79,7 @@ namespace CrowbarWebsite.Models
         SHOW_ANAAAL_CAS,
         PREF_AREAA_RADIUS,
         PREF_ADVFL_MAXCAS,
-        PREF_ADVFL_MINCAS
+        PREF_ADVFL_MINCAS,
+        PREF_ADVOP_HEATMAP
     }
 }

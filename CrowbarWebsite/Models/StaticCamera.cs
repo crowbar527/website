@@ -19,7 +19,7 @@ namespace CrowbarWebsite.Models
         public string Street => _street;
         public string Area => _area;
 
-        internal string GetInternalName()
+        public string GetInternalName()
         {
             return $"{_street}.{_area}";
         }
