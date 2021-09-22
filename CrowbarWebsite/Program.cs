@@ -14,7 +14,7 @@ namespace CrowbarWebsite
 {
     public class Program
     {
-        public static bool RUNTIME_FLAG_NOCACHE=> false;
+        public static bool RUNTIME_FLAG_NOCACHE=> true;
         public static void Main(string[] args)
         {
             CreateHostBuilder(args).Build().Run();

@@ -31,7 +31,9 @@ namespace CrowbarWebsite.Services
         public static DateTime LastUpdated => _lastUpdate;
         public static int RecommendedTTL => UPDATEINTERVAL;
         public static int LoadPercentage => _expectedCount == 0 ? 0 : (int)Math.Min(100, Math.Max(0, 100 * ((float)_cache.Count) / _expectedCount));
-        public static ConcurrentBag<StaticCamera> Cameras => _cameras;
+        public static ConcurrentBag<StaticCamera> Cameras { get { if (_cameras.IsEmpty) { DWCAMERAS(); } return _cameras; } }
+
+
 
         public static double CASRadiusInMeters => ConvertToMeters(CASMATCHBOUNDS);
 
@@ -43,6 +45,7 @@ namespace CrowbarWebsite.Services
         public static List<Point> GetPointsForCamera(string camera)
         {
             if (Program.RUNTIME_FLAG_NOCACHE)
+
                 return new List<Point>();
             if (!_cache.ContainsKey(camera))
             {
@@ -79,7 +82,25 @@ namespace CrowbarWebsite.Services
         {
             DownloadAsync();
         }
+        private static void DWCAMERAS()
+        {
+            string xmlstr = AWSHelpers.downloadXML().Result;
 
+            //For Each Camera
+            using (var xmlr = XMLHelpers.CreateFromString(xmlstr))
+            {
+                StaticCamera camerax = null;
+                do
+                {
+                    camerax = StaticCamera.FromXML(xmlr);
+                    if (camerax != null)
+                    {
+                        _cameras.Add(camerax);
+                    }
+
+                } while (camerax != null);
+            }
+        }
         private static void DownloadAsync()
         {
             //If backgroundRunning flag is set, then process already running

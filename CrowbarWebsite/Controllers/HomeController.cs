@@ -43,6 +43,12 @@ namespace CrowbarWebsite.Controllers
             return Json("Ok");
         }
 
+        [HttpGet]
+        public IActionResult GetCameraData(string f1)
+        {
+            return Json(CacheService.Cameras);
+        }
+
         public IActionResult Map()
         {
             return PartialView("Map");
