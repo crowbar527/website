@@ -14,7 +14,7 @@
     @if (!SignInManager.IsSignedIn(User))
     {
         <div id="indexBANNER_giveusyourcookies">
-            Login or Register to access all site features!
+            <a id="register" asp-area="Identity" asp-page="/Account/Register">Register</a> or <a id="login" asp-area="Identity" asp-page="/Account/Login">Login</a> to access all site features!
         </div>
             <partial name="Map" />
     }
