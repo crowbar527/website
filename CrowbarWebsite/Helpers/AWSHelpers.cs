@@ -24,8 +24,9 @@ namespace CrowbarWebsite.Helpers
 {
     internal class AWSHelpers
     {
-        private static string mainAccountAccess = "AKIAQHSUYTC4ZUPJYWRK";
-        private static string mainAccountSecret = "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";
+        //These are needed for service access, previous keys in commit history are invalid!
+        private static string mainAccountAccess = "";
+        private static string mainAccountSecret = "";
 
         internal static async Task<string> downloadXML()
         {
