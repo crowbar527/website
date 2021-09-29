@@ -37,7 +37,7 @@ namespace CrowbarWebsite.Helpers
             var sessionCreds = new SessionAWSCredentials(sessionResponse.Credentials.AccessKeyId,
                 sessionResponse.Credentials.SecretAccessKey, sessionResponse.Credentials.SessionToken);
             AWSCredentials tempCredentials =
-                new AssumeRoleAWSCredentials(sessionCreds, "arn:aws:iam::383519745720:role/Crowbar_S3-Access", "crowbarwebsite");
+                new AssumeRoleAWSCredentials(sessionCreds, "insertyourrolehere", "crowbarwebsite");
             AmazonS3Client s3Client = new AmazonS3Client(tempCredentials, RegionEndpoint.USEast2);
             try
             {
